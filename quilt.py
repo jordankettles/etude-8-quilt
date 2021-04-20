@@ -10,15 +10,19 @@
 
 import sys, graphics, math
 
+windowSize = 500
+
 size = 0.0
 
-def newRectangle(x, y, scale, r, g, b):
+def newRectangle(x, y, r, g, b):
     rect = graphics.Rectangle(x, y)
+    rect.setFill("red")
+    rect.setOutline("blue")
     return rect
 
 
 def main():
-    win = GraphWin("My Rectangle!", 500, 500)
+    win = GraphWin("My Rectangle!", windowSize, windowSize)
     c = Rectangle(Point(10,10), Point(200,200))
     c.draw(win)
     win.getMouse() # Pause to view result
@@ -33,19 +37,36 @@ for line in sys.stdin:
 for line in in_list:
     size += float(line[0])
 
-size = math.floor(500 / size)
-# squares = list()
-# print(size)
+size = math.floor(windowSize / size)
+squares = list()
+print(size)
 
-previous_x = start_x = graphics.Point(round(250-(size/2)), round(250-(size/2)))
-previous_y = start_y = graphics.Point(round(250+(size/2)), round(250+(size/2)))W
+prev_x = rect_x = graphics.Point(windowSize/2, windowSize/2)
+prev_y = rect_y = graphics.Point(windowSize/2, windowSize/2)
 
 window = graphics.GraphWin("QUILT!", 500, 500)
-
-r = newRectangle(start_x, start_y, float(in_list[0][0]), int(in_list[0][1]), int(in_list[0][2]), int(in_list[0][3]))
+r = newRectangle(rect_x, rect_y, int(in_list[0][1]), int(in_list[0][2]), int(in_list[0][3]))
 r.draw(window)
 
-# for square in in_list:
-#     squares.append()
+# recursively draw each square?
+
+
+    # move the Point.
+#     # Create the Rectangle
+#     # Draw the Rectangle
+for(int i = 0; i < len(in_list)):
+    scale = float(square[0])
+    movement = round((scale*size)/2)
+    print(movement)
+    rect_x.move(-movement, -movement)
+    rect_y.move(movement, movement)
+    print(rect_x)
+    print(rect_y)
+        # draw each square.
+        squares.append(newRectangle(rect_x, rect_y, int(square[1]), int(square[2]), int(square[3])))
+
+for square in squares:
+    square.draw(window)
+
 window.getMouse()
 window.close()
