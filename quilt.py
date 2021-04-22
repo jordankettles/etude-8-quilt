@@ -1,72 +1,91 @@
-# Later squares might not be smaller than earlier ones, nor the first square
-# has a scale parameter of 1.
+# Etude 8 Quilt
+# Jordan Kettles 2147684
+# 22 April 2021
 
-# Part of the problem is to ensure that whatever scale parameters are given,
-# my representation fits, and nearly fills, a reasonably sized window.
+# Uses graphics.py under GPL.
 
-# Read in all input.
-# calculate the 1.0 scale to fit everything in a 500 * 500 window.
-# Draw each square
-
-import sys, graphics, math
+import sys, graphics, math, copy
 
 windowSize = 500
 
-size = 0.0
+# Square class for holding information on each type of square.
+class Square:
 
-def newRectangle(x, y, r, g, b):
-    rect = graphics.Rectangle(x, y)
-    rect.setFill("red")
-    rect.setOutline("blue")
-    return rect
+    size = 0.0
 
+    def __init__(self, scale, red, green, blue):
+        self.scale = scale
+        self.red = red
+        self.green = green
+        self.blue = blue
+        Square.size += scale
 
-def main():
-    win = GraphWin("My Rectangle!", windowSize, windowSize)
-    c = Rectangle(Point(10,10), Point(200,200))
-    c.draw(win)
-    win.getMouse() # Pause to view result
-    win.close()    # Close window when done
+    def setCentre(self, point):
+        self.centre = point
 
+    def getCentre(self):
+        return self.centre
 
-in_list = list()
+    def moveCentre(self, x, y):
+        self.centre.move(x, y)
+
+    def getLength(self):
+        # Almost fit the window.
+        return round((self.scale*Square.size)/1.1)
+
+    def drawSquare(self, window):
+        if self.centre is not None:
+            p1 = copy.deepcopy(self.centre)
+            p2 = copy.deepcopy(self.centre)
+            p1.move(-self.getLength() / 2, -self.getLength() / 2) # point 1.
+            p2.move(self.getLength() / 2, self.getLength() / 2) # point 2.
+            sq = graphics.Rectangle(p1, p2) # square.
+            sq.setFill(graphics.color_rgb(self.red, self.green, self.blue))
+            sq.setOutline(graphics.color_rgb(self.red, self.green, self.blue))
+            sq.draw(window)
+
+# queue holds the next square to draw, and the type of square.
+queue = list()
+# squares hold each type of square.
+squares = list()
+
+# read input
 for line in sys.stdin:
     line = line.strip()
-    in_list.append(line.split(" "))
+    s = line.split(" ")
+    squares.append(Square(float(s[0]), int(s[1]), int(s[2]), int(s[3])))
 
-for line in in_list:
-    size += float(line[0])
+Square.size = math.floor(windowSize / Square.size)
 
-size = math.floor(windowSize / size)
-squares = list()
-print(size)
+window = graphics.GraphWin("Quilt", 500, 500)
+squares[0].setCentre(graphics.Point(windowSize / 2, windowSize / 2));
+queue.append([squares[0], 1])
 
-prev_x = rect_x = graphics.Point(windowSize/2, windowSize/2)
-prev_y = rect_y = graphics.Point(windowSize/2, windowSize/2)
+# draw squares
+while len(queue) > 0:
+    current = queue.pop(0)
+    depth = current[1]
+    current_square = current[0]
+    current_square.drawSquare(window)
+    if depth < len(squares):
+        tl = copy.deepcopy(squares[depth]) # top left.
+        tl.setCentre(copy.deepcopy(current_square.getCentre()))
+        tl.moveCentre(-current_square.getLength() / 2, -current_square.getLength() / 2)
+        queue.append([tl, depth+1])
+        tr = copy.deepcopy(squares[depth]) # top right.
+        tr.setCentre(copy.deepcopy(current_square.getCentre()))
+        tr.moveCentre(current_square.getLength() / 2, -current_square.getLength() / 2)
+        queue.append([tr, depth+1])
+        bl = copy.deepcopy(squares[depth]) # bottom left.
+        bl.setCentre(copy.deepcopy(current_square.getCentre()))
+        bl.moveCentre(-current_square.getLength() / 2, current_square.getLength() / 2)
+        queue.append([bl, depth+1])
+        br = copy.deepcopy(squares[depth]) # bottom right.
+        br.setCentre(copy.deepcopy(current_square.getCentre()))
+        br.moveCentre(current_square.getLength() / 2, current_square.getLength() / 2)
+        queue.append([br, depth+1])
 
-window = graphics.GraphWin("QUILT!", 500, 500)
-r = newRectangle(rect_x, rect_y, int(in_list[0][1]), int(in_list[0][2]), int(in_list[0][3]))
-r.draw(window)
 
-# recursively draw each square?
-
-
-    # move the Point.
-#     # Create the Rectangle
-#     # Draw the Rectangle
-for(int i = 0; i < len(in_list)):
-    scale = float(square[0])
-    movement = round((scale*size)/2)
-    print(movement)
-    rect_x.move(-movement, -movement)
-    rect_y.move(movement, movement)
-    print(rect_x)
-    print(rect_y)
-        # draw each square.
-        squares.append(newRectangle(rect_x, rect_y, int(square[1]), int(square[2]), int(square[3])))
-
-for square in squares:
-    square.draw(window)
-
+print("Click the window to close.")
 window.getMouse()
 window.close()
