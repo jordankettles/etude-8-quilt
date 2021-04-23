@@ -12,6 +12,7 @@ windowSize = 500
 class Square:
 
     size = 0.0
+    MaxScale = 0.0
 
     def __init__(self, scale, red, green, blue):
         self.scale = scale
@@ -19,6 +20,8 @@ class Square:
         self.green = green
         self.blue = blue
         Square.size += scale
+        if scale > Square.MaxScale:
+            Square.MaxScale = scale
 
     def setCentre(self, point):
         self.centre = point
@@ -31,7 +34,7 @@ class Square:
 
     def getLength(self):
         # Almost fit the window.
-        return round((self.scale*Square.size)/1.1)
+        return round((self.scale*(Square.size / Square.MaxScale))/1.1)
 
     def drawSquare(self, window):
         if self.centre is not None:
@@ -55,7 +58,7 @@ for line in sys.stdin:
     s = line.split(" ")
     squares.append(Square(float(s[0]), int(s[1]), int(s[2]), int(s[3])))
 
-Square.size = math.floor(windowSize / Square.size)
+Square.size = math.floor(windowSize / (Square.size / Square.MaxScale))
 
 window = graphics.GraphWin("Quilt", 500, 500)
 squares[0].setCentre(graphics.Point(windowSize / 2, windowSize / 2));
