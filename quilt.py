@@ -60,7 +60,7 @@ for line in sys.stdin:
 
 Square.size = math.floor(windowSize / (Square.size / Square.MaxScale))
 
-window = graphics.GraphWin("Quilt", 500, 500)
+window = graphics.GraphWin("Quilt", windowSize, windowSize, autoflush=False)
 squares[0].setCentre(graphics.Point(windowSize / 2, windowSize / 2));
 queue.append([squares[0], 1])
 
@@ -88,6 +88,7 @@ while len(queue) > 0:
         br.moveCentre(current_square.getLength() / 2, current_square.getLength() / 2)
         queue.append([br, depth+1])
 
+window.flush()
 
 print("Click the window to close.")
 window.getMouse()
